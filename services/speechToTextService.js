@@ -32,36 +32,46 @@ export function startTranscription(io) {
 
         // Emitting the transcription data to all connected clients
         io.emit("transcription", transcript);
-      });
+      })
+      .on("end", () => {});
   }
 
   if (!recordStream) {
-    recordStream = recorder
-      .record({
-        sampleRateHertz: sampleRateHertz,
-        threshold: 0,
-        // Other options, see https://www.npmjs.com/package/node-record-lpcm16#options
-        verbose: false,
-        recordProgram: "rec", // Try also "arecord" or "sox"
-        silence: "10.0",
-      })
-      .stream()
-      .on("error", console.error)
-      .pipe(recordingProcess);
+    recordStream = recorder.record({
+      sampleRateHertz: sampleRateHertz,
+      threshold: 0,
+      // Other options, see https://www.npmjs.com/package/node-record-lpcm16#options
+      verbose: false,
+      recordProgram: "rec", // Try also "arecord" or "sox"
+      silence: "10.0",
+    });
+    recordStream.stream().on("error", console.error).pipe(recordingProcess);
   }
   console.log("Listening, press Ctrl+C to stop.");
 }
 
 export function stopTranscription() {
-  // does not work yet!!
-  if (recordingProcess) {
-    recordingProcess = null;
+  if (recordStream) {
+    // WAIT till recordStream has finished processing
+    recordStream.stream().on("end", () => {
+      console.log("Recording stream finished.");
+
+      if (recordingProcess) {
+        recordingProcess.end();
+        recordingProcess = null;
+        console.log("Transcription process closed.");
+      }
+    });
+
+    recordStream.stop();
+    recordStream = null;
+  } else {
+    if (recordingProcess) {
+      recordingProcess.end();
+      recordingProcess = null;
+      console.log("Transcription process closed.");
+    }
   }
 
-  if (recordingProcess) {
-    recordingProcess.end();
-    recordingProcess = null;
-  }
-
-  console.log("Transcription stopped.");
+  console.log("Transcription stopping...");
 }
