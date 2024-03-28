@@ -8,7 +8,7 @@ const languageCode = "en-US";
 let recordingProcess = null;
 let recordStream = null;
 
-export function startTranscription() {
+export function startTranscription(io) {
   const client = new speech.SpeechClient();
 
   const request = {
@@ -24,13 +24,15 @@ export function startTranscription() {
     recordingProcess = client
       .streamingRecognize(request)
       .on("error", console.error)
-      .on("data", (data) =>
-        process.stdout.write(
+      .on("data", (data) => {
+        const transcript =
           data.results[0] && data.results[0].alternatives[0]
             ? `Transcription: ${data.results[0].alternatives[0].transcript}\n`
-            : "\n\nReached transcription time limit, press Ctrl+C\n"
-        )
-      );
+            : "\n\nReached transcription time limit, press Ctrl+C\n";
+
+        // Emitting the transcription data to all connected clients
+        io.emit("transcription", transcript);
+      });
   }
 
   if (!recordStream) {
@@ -51,9 +53,8 @@ export function startTranscription() {
 }
 
 export function stopTranscription() {
-    // does not work yet!!
+  // does not work yet!!
   if (recordingProcess) {
-   
     recordingProcess = null;
   }
 
