@@ -1,5 +1,6 @@
 import recorder from "node-record-lpcm16";
 import speech from "@google-cloud/speech";
+import { analyzeComment } from "./commentAnalyzer.js";
 
 const encoding = "LINEAR16";
 const sampleRateHertz = 16000;
@@ -24,14 +25,21 @@ export function startTranscription(io) {
     recordingProcess = client
       .streamingRecognize(request)
       .on("error", console.error)
-      .on("data", (data) => {
+      .on("data", async (data) => {
         const transcript =
           data.results[0] && data.results[0].alternatives[0]
-            ? `Transcription: ${data.results[0].alternatives[0].transcript}\n`
+            ? `${data.results[0].alternatives[0].transcript}\n`
             : "\n\nReached transcription time limit, press Ctrl+C\n";
 
-        // Emitting the transcription data to all connected clients
-        io.emit("transcription", transcript);
+        try {
+          const analysisResult = await analyzeComment(transcript);
+          io.emit("transcriptionAnalysis", {
+            transcript,
+            analysisResult,
+          });
+        } catch (error) {
+          console.error("Error analyzing the transcription: ", error);
+        }
       })
       .on("end", () => {});
   }

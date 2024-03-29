@@ -2,7 +2,10 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import cors from "cors";
-import { startTranscription, stopTranscription } from "./services/speechToTextService.js";
+import {
+  startTranscription,
+  stopTranscription,
+} from "./services/speechToText.js";
 
 const app = express();
 app.use(cors());
