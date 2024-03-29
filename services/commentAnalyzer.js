@@ -1,10 +1,9 @@
 import { google } from "googleapis";
 
-const API_KEY = "AIzaSyCWJZj1kgCLhK9JLBCHD_dYlHmx1RsOu5M";
-const DISCOVERY_URL =
-  "https://commentanalyzer.googleapis.com/$discovery/rest?version=v1alpha1";
-
 export async function analyzeComment(transcript) {
+  const API_KEY = process.env.API_KEY;
+  const DISCOVERY_URL =
+    "https://commentanalyzer.googleapis.com/$discovery/rest?version=v1alpha1";
   try {
     const client = await google.discoverAPI(DISCOVERY_URL);
     const analyzeRequest = {
