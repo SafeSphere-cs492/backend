@@ -31,11 +31,14 @@ export function startTranscription(io) {
             ? `${data.results[0].alternatives[0].transcript}\n`
             : "\n\nReached transcription time limit, press Ctrl+C\n";
 
+        const timestamp = new Date();
+
         try {
           const analysisResult = await analyzeComment(transcript);
           io.emit("transcriptionAnalysis", {
             transcript,
             analysisResult,
+            timestamp,
           });
         } catch (error) {
           console.error("Error analyzing the transcription: ", error);
@@ -55,10 +58,11 @@ export function startTranscription(io) {
     });
     recordStream.stream().on("error", console.error).pipe(recordingProcess);
   }
+  io.emit("recordingStatus", { recording: true });
   console.log("Listening, press Ctrl+C to stop.");
 }
 
-export function stopTranscription() {
+export function stopTranscription(io) {
   if (recordStream) {
     // WAIT till recordStream has finished processing
     recordStream.stream().on("end", () => {
@@ -67,6 +71,7 @@ export function stopTranscription() {
       if (recordingProcess) {
         recordingProcess.end();
         recordingProcess = null;
+        io.emit("recordingStatus", { recording: false });
         console.log("Transcription process closed.");
       }
     });
@@ -77,6 +82,7 @@ export function stopTranscription() {
     if (recordingProcess) {
       recordingProcess.end();
       recordingProcess = null;
+      io.emit("recordingStatus", { recording: false });
       console.log("Transcription process closed.");
     }
   }

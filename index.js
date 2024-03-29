@@ -26,7 +26,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("stopTranscription", () => {
-    stopTranscription();
+    stopTranscription(io);
   });
 });
 
