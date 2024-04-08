@@ -17,6 +17,8 @@ const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
     origin: "*", // CHANGE FOR PROD
+    methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
@@ -31,6 +33,10 @@ io.on("connection", (socket) => {
 });
 
 const port = process.env.PORT || 3000;
+
+app.get("/", (req, res) => {
+  res.status(200).send("App running");
+});
 
 httpServer.listen(port, () => {
   console.log("App is running with Socket.IO!");
