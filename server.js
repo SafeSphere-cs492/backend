@@ -16,7 +16,7 @@ const httpServer = createServer(app);
 // attach socket.io to the HTTP server
 const io = new Server(httpServer, {
   cors: {
-    origin: "*", // CHANGE FOR PROD
+    origin: "http://localhost:3000", // CHANGE FOR PROD
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -35,7 +35,7 @@ io.on("connection", (socket) => {
 const port = process.env.PORT || 3000;
 
 app.get("/", (req, res) => {
-  res.status(200).send("App running");
+  res.status(200).send("App running but not websockt :((");
 });
 
 httpServer.listen(port, () => {
