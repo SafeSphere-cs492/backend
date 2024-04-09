@@ -16,9 +16,11 @@ const httpServer = createServer(app);
 // attach socket.io to the HTTP server
 const io = new Server(httpServer, {
   cors: {
-    origin: "https://safe-sphere.netlify.app", // CHANGE FOR PROD
+    origin: "*",
     methods: ["GET", "POST"],
+    credentials: true,
   },
+  allowEIO3: true,
 });
 
 io.on("connection", (socket) => {
@@ -29,6 +31,10 @@ io.on("connection", (socket) => {
   socket.on("stopTranscription", () => {
     stopTranscription(io);
   });
+});
+
+httpServer.prependListener("request", (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
 });
 
 const port = process.env.PORT || 3000;
