@@ -16,7 +16,7 @@ const httpServer = createServer(app);
 // attach socket.io to the HTTP server
 const io = new Server(httpServer, {
   cors: {
-    origin: "https://safe-sphere.netlify.app/", // CHANGE FOR PROD
+    origin: "https://safe-sphere.netlify.app", // CHANGE FOR PROD
     methods: ["GET", "POST"],
   },
 });
