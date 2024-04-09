@@ -18,7 +18,6 @@ const io = new Server(httpServer, {
   cors: {
     origin: "http://localhost:3000", // CHANGE FOR PROD
     methods: ["GET", "POST"],
-    credentials: true,
   },
 });
 
